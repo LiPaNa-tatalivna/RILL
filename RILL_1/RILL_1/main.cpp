@@ -1,5 +1,5 @@
-
 #include <iostream>
+#include <stdexcept>
 
 class SmartArray {
 private:
@@ -16,27 +16,26 @@ public:
         delete[] data;
     }
 
+    SmartArray(const SmartArray&) = delete;
+    SmartArray& operator=(const SmartArray&) = delete;
+
     void addElement(int element) {
-        size_zapolnen++;
-        if (size_pamyt < size_zapolnen){
+        if (size_zapolnen == size_pamyt) {
             size_pamyt *= 2;
             int* newData = new int[size_pamyt];
-            for (int i = 0; i < size_zapolnen - 1; i++) {
+            for (int i = 0; i < size_zapolnen; i++) {
                 newData[i] = data[i];
             }
-            newData[size_zapolnen] = element;
-    
             delete[] data;
             data = newData;
-        }else{
-            data[size_zapolnen] = element;
         }
+        data[size_zapolnen] = element;
+        size_zapolnen++;
     }
 
     int getElement(int index) {
-        if (index < 0 || index > size_pamyt) {
-            std::cout << "Invalid index!" << std::endl;
-            return -1; // or throw an exception
+        if (index < 0 || index >= size_zapolnen) {
+            throw std::out_of_range("Invalid index!");
         }
         return data[index];
     }
@@ -52,9 +51,13 @@ int main() {
         arr.addElement(14);
         arr.addElement(15);
 
-        std::cout << arr.getElement(5) << std::endl;
+        std::cout << arr.getElement(4) << std::endl;
+        std::cout << arr.getElement(5) << std::endl; // Throws an exception
     }
     catch (const std::exception& ex) {
         std::cout << ex.what() << std::endl;
     }
+
+    return 0;
 }
+
